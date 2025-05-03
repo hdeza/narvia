@@ -60,7 +60,7 @@ export default function Header() {
   return (
     <header className={headerClasses}>
       {/* Logo */}
-      <div className="relative w-[45px] h-[45px] md:w-[55px] md:h-[55px]">
+      <div className="relative w-[45px] h-[45px] md:w-[60px] md:h-[60px]">
         <Image
           alt="NarvIA Logo"
           src="/logoNarvIA.webp"
@@ -87,7 +87,7 @@ export default function Header() {
 
       {/* Botón de soporte (solo desktop) */}
       {isClient && !isMobile && (
-        <button className="hidden md:block text-white text-sm font-medium px-5 py-2 rounded-full bg-gradient-to-r from-[#801AE5] to-[#09CE69] hover:opacity-90 transition-opacity">
+        <button className="hidden md:block text-white text-sm font-medium px-8 py-2 rounded-lg bg-gradient-to-r from-[#801AE5] to-[#09CE69] hover:opacity-90 transition-opacity">
           Soporte
         </button>
       )}

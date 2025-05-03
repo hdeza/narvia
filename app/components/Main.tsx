@@ -94,7 +94,7 @@ export default function Main() {
       {/* Content container - añadido padding superior para compensar el header */}
       <div className="relative z-10 min-h-screen flex items-center justify-center pt-16 md:pt-0">
         <div className="mx-auto px-4 text-center space-y-4">
-          <button className="relative text-primary text-xl p-[1px] rounded-full bg-gradient-to-r from-[#801AE5] to-[#09CE69]">
+          <button className="relative text-primary p-[1px] rounded-full bg-gradient-to-r from-[#801AE5] to-[#09CE69]">
             <div className="bg-[#0C0D14]/90 transition-colors px-15 py-1 rounded-full">
               NarvIA
             </div>
