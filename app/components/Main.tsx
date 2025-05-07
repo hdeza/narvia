@@ -1,17 +1,29 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
+import gsap from "gsap";
+import { TextPlugin } from "gsap/TextPlugin";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Registramos los plugins necesarios
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(TextPlugin, ScrollTrigger);
+}
 
 const ContactButton = () => {
   const handleClick = () => {
-    console.log("Hola");
+    const contactoSection = document.getElementById("contacto");
+    if (contactoSection) {
+      contactoSection.scrollIntoView({ behavior: "smooth" });
+    }
   };
 
   return (
     <button
       onClick={handleClick}
-      className="relative px-6 py-2 font-bold rounded-lg bg-gradient-to-r from-[#801AE5] to-[#09CE69] text-center"
+      className="relative px-6 py-2 font-bold rounded-lg bg-gradient-to-r from-[#801AE5] to-[#09CE69] text-center cursor-pointer opacity-0"
+      id="contact-button"
     >
       Contáctanos
     </button>
@@ -19,6 +31,13 @@ const ContactButton = () => {
 };
 
 export default function Main() {
+  // Referencias para animaciones
+  const titleRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const logoRef = useRef(null);
+  const leftSvgRef = useRef(null);
+  const rightSvgRef = useRef(null);
+
   // Estado para manejar correctamente el lado del cliente
   const [isMobile, setIsMobile] = useState(false);
   const [isClient, setIsClient] = useState(false);
@@ -39,6 +58,73 @@ export default function Main() {
     // Limpiar el listener
     return () => window.removeEventListener("resize", handleResize);
   }, []);
+
+  // Efecto para las animaciones cuando el componente se monta
+  useEffect(() => {
+    if (!isClient) return;
+
+    // Timeline principal
+    const tl = gsap.timeline({ defaults: { ease: "power3.out" } });
+
+    // Animación del logo
+    tl.fromTo(
+      logoRef.current,
+      { scale: 0, opacity: 0 },
+      { scale: 1, opacity: 1, duration: 0.8 }
+    );
+
+    // Animación de typing para el título
+    tl.fromTo(
+      titleRef.current,
+      { text: "", opacity: 0 },
+      {
+        duration: 2.5,
+        text: "Transformamos tus datos en decisiones inteligentes",
+        opacity: 1,
+        ease: "none",
+      }
+    );
+
+    // Animación para la descripción
+    tl.fromTo(
+      descriptionRef.current,
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8 },
+      "-=0.5"
+    );
+
+    // Animación para el botón de contacto
+    tl.fromTo(
+      "#contact-button",
+      { y: 20, opacity: 0 },
+      { y: 0, opacity: 1, duration: 0.8 },
+      "-=0.5"
+    );
+
+    // Animaciones para los SVGs laterales (sólo en escritorio)
+    if (!isMobile) {
+      // SVG izquierdo - entra desde la izquierda
+      tl.fromTo(
+        leftSvgRef.current,
+        { x: -200, opacity: 0 },
+        { x: 0, opacity: 0.9, duration: 1.2, ease: "power2.out" },
+        "-=1"
+      );
+
+      // SVG derecho - entra desde la derecha
+      tl.fromTo(
+        rightSvgRef.current,
+        { x: 200, opacity: 0 },
+        { x: 0, opacity: 0.9, duration: 1.2, ease: "power2.out" },
+        "-=1.2"
+      );
+    }
+
+    return () => {
+      // Limpiamos las animaciones
+      tl.kill();
+    };
+  }, [isClient, isMobile]);
 
   // Gradiente superior ajustado para móviles
   const topGradientPosition = isClient ? (isMobile ? "-40%" : "-10%") : "-20%";
@@ -63,9 +149,12 @@ export default function Main() {
         }}
       />
 
-      {/* Topology SVG Left - Tamaño reducido */}
+      {/* Topology SVG Left - Con referencia para animación */}
       {isClient && (
-        <div className="absolute left-0 top-[40%] -translate-y-1/2 w-[15%] md:w-[18%] h-auto max-h-[500px] opacity-90 z-0 hidden md:block pointer-events-none">
+        <div
+          ref={leftSvgRef}
+          className="absolute left-0 top-[40%] -translate-y-1/2 w-[15%] md:w-[18%] h-auto max-h-[500px] opacity-0 z-0 hidden md:block pointer-events-none"
+        >
           <Image
             src="/Topology-1.svg"
             alt="Topology Left Decoration"
@@ -77,9 +166,12 @@ export default function Main() {
         </div>
       )}
 
-      {/* Topology SVG Right - Tamaño reducido */}
+      {/* Topology SVG Right - Con referencia para animación */}
       {isClient && (
-        <div className="absolute right-0 top-[42%] -translate-y-1/2 w-[15%] md:w-[18%] h-auto max-h-[500px] opacity-90 z-0 hidden md:block pointer-events-none">
+        <div
+          ref={rightSvgRef}
+          className="absolute right-0 top-[42%] -translate-y-1/2 w-[15%] md:w-[18%] h-auto max-h-[500px] opacity-0 z-0 hidden md:block pointer-events-none"
+        >
           <Image
             src="/Topology-2.svg"
             alt="Topology Right Decoration"
@@ -91,22 +183,34 @@ export default function Main() {
         </div>
       )}
 
-      {/* Content container - añadido padding superior para compensar el header */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center pt-16 md:pt-0">
+      {/* Content container */}
+      <div className="relative z-10 min-h-screen flex items-center justify-center md:pt-0">
         <div className="mx-auto px-4 text-center space-y-4">
-          <button className="relative text-primary p-[1px] rounded-full bg-gradient-to-r from-[#801AE5] to-[#09CE69]">
+          <button
+            ref={logoRef}
+            className="relative text-primary p-[1px] rounded-full bg-gradient-to-r from-[#801AE5] to-[#09CE69] opacity-0"
+          >
             <div className="bg-[#0C0D14]/90 transition-colors px-15 py-1 rounded-full">
               NarvIA
             </div>
           </button>
-          <h1 className="mx-auto text-4xl md:text-6xl font-bold py-4 max-w-3xl bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] from-30% via-[#801AE5] via-% to-[#09CE69] to-69%">
-            Transformamos tus datos en decisiones inteligentes
+
+          <h1
+            ref={titleRef}
+            className="mx-auto text-4xl md:text-6xl font-bold py-4 max-w-3xl bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] from-30% via-[#801AE5] via-% to-[#09CE69] to-69%"
+          >
+            {/* El texto se llenará con la animación */}
           </h1>
-          <p className="max-w-4xl mx-auto text-md text-gray-300 mb-10">
+
+          <p
+            ref={descriptionRef}
+            className="max-w-4xl mx-auto text-md text-gray-300 mb-10 opacity-0"
+          >
             Automatizamos y optimizamos los procesos de tu empresa mediante
             plataformas tecnológicas avanzadas, inteligencia artificial y
             analítica de datos de alto impacto.
           </p>
+
           <ContactButton />
         </div>
       </div>

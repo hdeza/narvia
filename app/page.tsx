@@ -3,7 +3,7 @@ import Header from "./components/Header";
 import Main from "./components/Main";
 import NuestrasCapacidades from "./components/NuestrasCapacidades";
 import NuestrasLineasNegocio from "./components/NuestrasLineasNegocio";
-
+import Footer from "./components/Footer";
 export default function Home() {
   return (
     <>
@@ -12,6 +12,7 @@ export default function Home() {
       <NuestrasCapacidades />
       <NuestrasLineasNegocio />
       <Contactanos />
+      <Footer />
     </>
   );
 }
