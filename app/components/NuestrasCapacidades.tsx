@@ -3,9 +3,9 @@ import CapacidadCard from "./CapacidadCard";
 
 export default function NuestrasCapacidades() {
   return (
-    <section className="flex flex-col items-center py-10">
+    <section className="flex flex-col items-center py-15">
       <button className="relative text-primary p-[1px] rounded-full bg-gradient-to-r from-[#801AE5] to-[#09CE69]">
-        <div className="bg-[#0C0D14]/90 transition-colors px-15 py-2 rounded-full">
+        <div className="bg-[#0C0D14]/90 transition-colors px-15 py-2 rounded-full font-bold">
           Nuestras Capacidades
         </div>
       </button>

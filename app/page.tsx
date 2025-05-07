@@ -1,3 +1,4 @@
+import Contactanos from "./components/Contactanos";
 import Header from "./components/Header";
 import Main from "./components/Main";
 import NuestrasCapacidades from "./components/NuestrasCapacidades";
@@ -10,6 +11,7 @@ export default function Home() {
       <Main />
       <NuestrasCapacidades />
       <NuestrasLineasNegocio />
+      <Contactanos />
     </>
   );
 }

@@ -32,7 +32,7 @@ const CapacidadCard: React.FC<CapacidadCardProps> = ({
         height={100}
         className="mx-auto"
       />
-      <h3 className="pt-4 pb-1">{title}</h3>
+      <h2 className="pt-4 pb-1">{title}</h2>
       <p className="text-gray-400">{description}</p>
     </div>
   </article>
