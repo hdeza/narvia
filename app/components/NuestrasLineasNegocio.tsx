@@ -1,11 +1,21 @@
 "use client";
+
 import React, { useState, useRef, useEffect } from "react";
 import LineasNegocio from "./LineasNegocio";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+
+// Register the ScrollTrigger plugin
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 export default function NuestrasLineasNegocio() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const carouselRef = useRef(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
   const startX = useRef(0);
   const currentX = useRef(0);
   const isDragging = useRef(false);
@@ -74,6 +84,7 @@ export default function NuestrasLineasNegocio() {
   ];
 
   useEffect(() => {
+    setIsClient(true);
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 640); // sm breakpoint
     };
@@ -82,6 +93,41 @@ export default function NuestrasLineasNegocio() {
     window.addEventListener("resize", checkMobile);
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  // Animation for the title
+  useEffect(() => {
+    if (!titleRef.current || !isClient) return;
+
+    // Create animation for the title
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: titleRef.current,
+        start: "top 85%",
+        toggleActions: "play none none none",
+      },
+    });
+
+    // Set initial state
+    gsap.set(titleRef.current, {
+      opacity: 0,
+      y: 30,
+    });
+
+    // Animate title
+    tl.to(titleRef.current, {
+      opacity: 1,
+      y: 0,
+      duration: 0.8,
+      ease: "power3.out",
+    });
+
+    return () => {
+      tl.kill();
+      if (tl.scrollTrigger) {
+        tl.scrollTrigger.kill();
+      }
+    };
+  }, [isClient]);
 
   const handleTouchStart = (e: TouchEvent) => {
     startX.current = e.touches[0].clientX;
@@ -146,13 +192,17 @@ export default function NuestrasLineasNegocio() {
   if (isMobile) {
     return (
       <section
+        id="lineas"
         className="py-16"
         style={{
           background: getBackground(),
         }}
       >
         <div className="container mx-auto px-4">
-          <h3 className="text-center text-4xl font-bold mb-12 bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] from-30% via-[#801AE5] via-% to-[#09CE69] to-70%">
+          <h3
+            ref={titleRef}
+            className="text-center text-4xl font-bold mb-12 bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] from-30% via-[#801AE5] via-% to-[#09CE69] to-70% opacity-0"
+          >
             Nuestras líneas de negocio
           </h3>
 
@@ -182,7 +232,8 @@ export default function NuestrasLineasNegocio() {
             >
               {lineas.map((linea, idx) => (
                 <div key={idx} className="w-full flex-shrink-0 px-4">
-                  <LineasNegocio {...linea} />
+                  <LineasNegocio {...linea} index={0} />{" "}
+                  {/* Set index to 0 for carousel items to avoid staggering */}
                 </div>
               ))}
             </div>
@@ -205,34 +256,38 @@ export default function NuestrasLineasNegocio() {
     );
   }
 
-  // Desktop view (original layout)
+  // Desktop view with animations and added index prop
   return (
     <section
+      id="lineas"
       className="py-16"
       style={{
         background: getBackground(),
       }}
     >
       <div className="container mx-auto px-4 max-w-7xl">
-        <h3 className="text-center text-4xl font-bold mb-12 bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] from-30% via-[#801AE5] via-% to-[#09CE69] to-70%">
+        <h3
+          ref={titleRef}
+          className="text-center text-4xl font-bold mb-12 bg-clip-text text-transparent bg-gradient-to-r from-[#FFFFFF] from-30% via-[#801AE5] via-% to-[#09CE69] to-70% opacity-0"
+        >
           Nuestras líneas de negocio
         </h3>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-5">
           {lineas.slice(0, 4).map((linea, idx) => (
-            <LineasNegocio key={idx} {...linea} />
+            <LineasNegocio key={idx} {...linea} index={idx} />
           ))}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
           {lineas.slice(4, 7).map((linea, idx) => (
-            <LineasNegocio key={idx + 4} {...linea} />
+            <LineasNegocio key={idx + 4} {...linea} index={idx} />
           ))}
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-[66.666%] mx-auto">
           {lineas.slice(7, 9).map((linea, idx) => (
-            <LineasNegocio key={idx + 7} {...linea} />
+            <LineasNegocio key={idx + 7} {...linea} index={idx} />
           ))}
         </div>
       </div>

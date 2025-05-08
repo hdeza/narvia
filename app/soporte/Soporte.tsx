@@ -1,17 +1,20 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
+import { sendEmail } from "../services/emailService";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { sendEmail } from "../services/emailService";
 
 // Registrar plugins
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
 }
 
-export default function Contactanos() {
+// Componente que recrea el formulario de soporte según el diseño proporcionado
+export default function Soporte() {
   const [formData, setFormData] = useState({
     nombre: "",
+    empresa: "",
     email: "",
     mensaje: "",
   });
@@ -88,9 +91,7 @@ export default function Contactanos() {
     return () => ctx.revert();
   }, []);
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
+  const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
     setFormData((prevState) => ({
       ...prevState,
@@ -98,11 +99,16 @@ export default function Contactanos() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
 
     // Validación básica del formulario
-    if (!formData.nombre || !formData.email || !formData.mensaje) {
+    if (
+      !formData.nombre ||
+      !formData.email ||
+      !formData.mensaje ||
+      !formData.empresa
+    ) {
       setSubmitStatus({
         type: "error",
         message: "Por favor, completa todos los campos del formulario.",
@@ -115,12 +121,12 @@ export default function Contactanos() {
     setSubmitStatus({ type: null, message: "" });
 
     // Prepara los datos para el template de EmailJS
-    // Asegúrate de que estos nombres coincidan con los de tu plantilla en EmailJS
+    // Usamos el mismo formato de templateParams que en Contactanos
     const templateParams = {
       name: formData.nombre,
       email: formData.email,
-      message: formData.mensaje,
-      title: "NarvIA - Contacto", // O el título que desees mostrar
+      message: `${formData.mensaje}\n\nEmpresa/Cliente: ${formData.empresa} `,
+      title: "NarvIA - Soporte", // Puedes personalizar este título si lo deseas
       time: new Date().toLocaleString(),
     };
 
@@ -134,16 +140,16 @@ export default function Contactanos() {
         setSubmitStatus({
           type: "success",
           message:
-            "¡Tu mensaje ha sido enviado correctamente! Nos pondremos en contacto pronto.",
+            "¡Tu caso ha sido registrado correctamente! Nos pondremos en contacto pronto.",
         });
         // Limpiar el formulario después del éxito
-        setFormData({ nombre: "", email: "", mensaje: "" });
+        setFormData({ nombre: "", empresa: "", email: "", mensaje: "" });
       } else {
         console.error("Error al enviar email:", result.error);
         setSubmitStatus({
           type: "error",
           message:
-            "Hubo un problema al enviar tu mensaje. Por favor, intenta nuevamente.",
+            "Hubo un problema al enviar tu caso. Por favor, intenta nuevamente.",
         });
       }
     } catch (error) {
@@ -151,7 +157,7 @@ export default function Contactanos() {
       setSubmitStatus({
         type: "error",
         message:
-          "Error al enviar el mensaje. Por favor, intenta nuevamente más tarde.",
+          "Error al enviar el caso. Por favor, intenta nuevamente más tarde.",
       });
     } finally {
       // Habilitar el botón nuevamente
@@ -162,25 +168,27 @@ export default function Contactanos() {
   return (
     <div
       ref={sectionRef}
-      id="contacto"
-      className="flex items-center justify-center min-h-screen bg-[#0C0D14] py-12"
+      id="soporte"
+      className="flex items-center justify-center min-h-screen bg-[#0C0D14] py-12 mt-20"
     >
-      <div className="w-full max-w-2xl p-8 md:p-14 mx-4 rounded-lg relative overflow-hidden border border-white/20 z-10">
-        {/* Línea decorativa superior */}
+      <div className="w-full max-w-2xl p-8 md:p-14 mx-4 rounded-lg relative overflow-hidden border border-white/20">
+        {/* Decorative divider line at top */}
         <div className="w-56 h-px bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 absolute top-0 left-1/2 -translate-x-1/2"></div>
 
         <h1
           ref={titleRef}
           className="text-3xl font-bold text-center text-white mb-4 opacity-0"
         >
-          Escríbenos
+          Radica tu caso para soporte
         </h1>
         <p
           ref={subtitleRef}
           className="text-center text-gray-300 mb-8 opacity-0"
         >
-          Queremos leerte y conocer tus inquietudes o sugerencias
+          Si nuestros clientes requieren de un soporte, mantenimiento o
+          consultoría, nos pueden contactar por medio de este formulario.
         </p>
+
         <form onSubmit={handleSubmit}>
           <div
             className="mb-6"
@@ -189,7 +197,7 @@ export default function Contactanos() {
             }}
           >
             <label htmlFor="nombre" className="block text-white mb-2">
-              Nombre:
+              Nombre del solicitante:
             </label>
             <input
               type="text"
@@ -202,15 +210,35 @@ export default function Contactanos() {
               required
             />
           </div>
-
           <div
             className="mb-6"
             ref={(el) => {
               inputsRef.current[1] = el as never;
             }}
           >
+            <label htmlFor="empresa" className="block text-white mb-2">
+              Empresa - Cliente solicitante:
+            </label>
+            <input
+              type="text"
+              id="empresa"
+              name="empresa"
+              value={formData.empresa}
+              onChange={handleChange}
+              placeholder="Nombre de la empresa o cliente"
+              className="w-full rounded-2xl bg-[#181920] text-white px-4 py-3 outline-none border-none"
+              required
+            />
+          </div>
+
+          <div
+            className="mb-6"
+            ref={(el) => {
+              inputsRef.current[2] = el as never;
+            }}
+          >
             <label htmlFor="email" className="block text-white mb-2">
-              Email:
+              Correo del solicitante:
             </label>
             <input
               type="email"
@@ -227,11 +255,11 @@ export default function Contactanos() {
           <div
             className="mb-6"
             ref={(el) => {
-              inputsRef.current[2] = el as never;
+              inputsRef.current[3] = el as never;
             }}
           >
             <label htmlFor="mensaje" className="block text-white mb-2">
-              Mensaje:
+              Descripción del requerimiento:
             </label>
             <textarea
               id="mensaje"
@@ -290,8 +318,8 @@ export default function Contactanos() {
             type="submit"
             ref={buttonRef}
             disabled={isSubmitting}
-            className={`w-full py-3 px-4 rounded-lg font-medium text-white bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 hover:opacity-90 transition-all flex items-center justify-center mb-12 opacity-0 cursor-pointer ${
-              isSubmitting ? "opacity-70 cursor-not-allowed" : ""
+            className={`relative z-10 w-full py-3 px-4 rounded-lg font-medium text-white bg-gradient-to-r from-purple-500 via-blue-500 to-green-500 hover:opacity-90 transition-opacity flex items-center justify-center mb-12 opacity-0 ${
+              isSubmitting ? "opacity-70 cursor-not-allowed" : "cursor-pointer"
             }`}
           >
             {isSubmitting ? (
@@ -339,10 +367,10 @@ export default function Contactanos() {
           </button>
         </form>
 
-        {/* Glow animado */}
+        {/* Background glow effect */}
         <div
           ref={glowRef}
-          className="pointer-events-none absolute -bottom-40 left-1/2 transform -translate-x-1/2 w-96 h-72 bg-gradient-to-r from-purple-700 via-blue-600 to-purple-700 rounded-full opacity-30 blur-3xl z-0"
+          className="absolute -bottom-40 left-1/2 transform -translate-x-1/2 w-96 h-72 bg-gradient-to-r from-purple-700 via-blue-600 to-purple-700 rounded-full opacity-30 blur-3xl pointer-events-none"
         ></div>
       </div>
     </div>

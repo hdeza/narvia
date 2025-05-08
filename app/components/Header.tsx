@@ -57,11 +57,29 @@ export default function Header() {
   // Enlaces de navegación
   const navLinks = [
     { name: "Inicio", href: "/" },
-    { name: "Nuestras capacidades", href: "#capacidades" },
-    { name: "Líneas de negocio", href: "#lineas" },
-    { name: "Nosotros", href: "#nosotros" },
-    { name: "Contáctanos", href: "#contacto" },
+    { name: "Nuestras capacidades", href: "/#capacidades" },
+    { name: "Líneas de negocio", href: "/#lineas" },
+    { name: "Nosotros", href: "/nosotros" },
+    { name: "Contáctanos", href: "/#contacto" },
   ];
+
+  // Función para manejar la navegación a secciones
+  const handleNavigation = (href: string) => {
+    if (href.startsWith("/#")) {
+      // Si estamos en otra página, primero navegamos a la página principal
+      if (window.location.pathname !== "/") {
+        window.location.href = href;
+      } else {
+        // Si ya estamos en la página principal, hacemos scroll suave
+        const sectionId = href.split("#")[1];
+        const element = document.getElementById(sectionId);
+        if (element) {
+          element.scrollIntoView({ behavior: "smooth" });
+        }
+      }
+    }
+    handleLinkClick();
+  };
 
   // Clases condicionales para el header
   const headerClasses = `
@@ -97,6 +115,12 @@ export default function Header() {
               <Link
                 key={index}
                 href={link.href}
+                onClick={(e) => {
+                  if (link.href.startsWith("/#")) {
+                    e.preventDefault();
+                    handleNavigation(link.href);
+                  }
+                }}
                 className="text-white hover:text-[#801AE5] transition-colors text-sm font-medium"
               >
                 {link.name}
@@ -107,9 +131,12 @@ export default function Header() {
 
         {/* Botón de soporte (solo desktop) */}
         {isClient && !isMobile && (
-          <button className="hidden md:block text-white text-sm font-medium px-8 py-2 rounded-lg bg-gradient-to-r from-[#801AE5] to-[#09CE69] hover:opacity-90 transition-opacity">
+          <Link
+            href="/soporte"
+            className="hidden md:block text-white text-sm font-medium px-8 py-2 rounded-lg bg-gradient-to-r from-[#801AE5] to-[#09CE69] hover:opacity-90 transition-opacity"
+          >
             Soporte
-          </button>
+          </Link>
         )}
 
         {/* Menú hamburguesa (visible solo en móvil) */}
@@ -141,17 +168,28 @@ export default function Header() {
                 <Link
                   key={index}
                   href={link.href}
+                  onClick={(e) => {
+                    if (link.href.startsWith("/#")) {
+                      e.preventDefault();
+                      handleNavigation(link.href);
+                    } else {
+                      handleLinkClick();
+                    }
+                  }}
                   className="text-white hover:text-[#801AE5] transition-colors text-lg font-medium"
-                  onClick={handleLinkClick}
                 >
                   {link.name}
                 </Link>
               ))}
             </nav>
 
-            <button className="mt-12 text-white text-sm font-medium px-8 py-3 rounded-lg bg-gradient-to-r from-[#801AE5] to-[#09CE69] hover:opacity-90 transition-opacity self-start">
+            <Link
+              href="/soporte"
+              className="mt-12 text-white text-sm font-medium px-8 py-3 rounded-lg bg-gradient-to-r from-[#801AE5] to-[#09CE69] hover:opacity-90 transition-opacity self-start"
+              onClick={handleLinkClick}
+            >
               Soporte
-            </button>
+            </Link>
           </div>
         </div>
       )}
