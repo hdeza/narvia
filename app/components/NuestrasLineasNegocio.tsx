@@ -273,23 +273,23 @@ export default function NuestrasLineasNegocio() {
           Nuestras líneas de negocio
         </h3>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-5">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 mb-5">
           {lineas.slice(0, 4).map((linea, idx) => (
             <LineasNegocio key={idx} {...linea} index={idx} />
           ))}
-        </div>
+        </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
+        <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-5">
           {lineas.slice(4, 7).map((linea, idx) => (
             <LineasNegocio key={idx + 4} {...linea} index={idx} />
           ))}
-        </div>
+        </section>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-[66.666%] mx-auto">
+        <section className="grid grid-cols-1 sm:grid-cols-2 gap-5 max-w-[66.666%] mx-auto">
           {lineas.slice(7, 9).map((linea, idx) => (
             <LineasNegocio key={idx + 7} {...linea} index={idx} />
           ))}
-        </div>
+        </section>
       </div>
     </section>
   );

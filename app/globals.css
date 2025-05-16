@@ -11,3 +11,12 @@ body {
   background: rgb(var(--background-start-rgb));
   font-family: var(--font-plus-jakarta), system-ui, sans-serif;
 }
+
+html,
+body {
+  overflow-x: hidden;
+}
+
+html {
+  scroll-behavior: smooth;
+}

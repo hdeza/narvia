@@ -78,7 +78,7 @@ export default function Main() {
       titleRef.current,
       { text: "", opacity: 0 },
       {
-        duration: 2.5,
+        duration: 2.1,
         text: "Transformamos tus datos en decisiones inteligentes",
         opacity: 1,
         ease: "none",
